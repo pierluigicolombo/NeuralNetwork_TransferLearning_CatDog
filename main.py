@@ -29,7 +29,6 @@ test_transforms = transforms.Compose([transforms.Resize(255),
                                       transforms.ToTensor(),
                                       transforms.Normalize([0.485, 0.456, 0.406],
                                                            [0.229, 0.224, 0.225])])
-
 # Pass transforms in here, then run the next cell to see how the transforms look
 train_data = datasets.ImageFolder(data_dir + '/train', transform=train_transforms)
 test_data = datasets.ImageFolder(data_dir + '/test', transform=test_transforms)
@@ -37,9 +36,6 @@ test_data = datasets.ImageFolder(data_dir + '/test', transform=test_transforms)
 trainloader = torch.utils.data.DataLoader(train_data, batch_size=64, shuffle=True)
 testloader = torch.utils.data.DataLoader(test_data, batch_size=64)
 
-#the pretrained model
-model = models.densenet121(pretrained=True)
-print(model)
 
 '''
 This model is built out of two main parts, the features and the classifier. 
@@ -51,19 +47,6 @@ That means we need to replace the classifier, but the features will work perfect
 In general, I think about pre-trained networks as amazingly good feature detectors that can be used as the input for simple feed-forward classifiers.
 '''
 
-# Freeze parameters so we don't backprop through them
-for param in model.parameters():
-    param.requires_grad = False
-
-from collections import OrderedDict
-classifier = nn.Sequential(OrderedDict([
-                          ('fc1', nn.Linear(1024, 500)),
-                          ('relu', nn.ReLU()),
-                          ('fc2', nn.Linear(500, 2)),
-                          ('output', nn.LogSoftmax(dim=1))
-                          ]))
-    
-model.classifier = classifier
 
 
 # Use GPU if it's available
